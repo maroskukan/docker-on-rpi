@@ -7,6 +7,8 @@
     - [Prepare SD Card](#prepare-sd-card)
     - [Boot the Image](#boot-the-image)
     - [OS Configuration](#os-configuration)
+  - [Docker Installation](#docker-installation)
+  - [Docker Upgrade](#docker-upgrade)
 
 ## Introduction
 
@@ -20,6 +22,7 @@ The following document describes the installation and configuration of Docker on
 [Setting up a wireless LAN via the CLI](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md)
 [Micro-SD Cards Benchmark](http://www.pidramble.com/wiki/benchmarks/microsd-cards)
 [RPi3 Card Reader Overclocking](https://www.jeffgeerling.com/blog/2016/how-overclock-microsd-card-reader-on-raspberry-pi-3)
+[Dockerhub ARM Images](https://registry.hub.docker.com/search?q=&type=image&architecture=arm%2Carm64)
 
 ## OS Installation
 
@@ -200,3 +203,151 @@ ssh pi@rpi01.home
 Linux rpi01 5.10.17-v7+ #1403 SMP Mon Feb 22 11:29:51 GMT 2021 armv7l
 ```
 
+## Docker Installation
+
+Downlaod the installation script.
+
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+```
+
+Execute teh script.
+
+```bash
+sudo sh get-docker.sh
+```
+
+Add `pi` user to Docker group
+
+```bash
+sudo usermod -aG docker pi
+```
+
+Logout and login and Verify version and info.
+
+```bash
+docker version
+Client: Docker Engine - Community
+ Version:           20.10.5
+ API version:       1.41
+ Go version:        go1.13.15
+ Git commit:        55c4c88
+ Built:             Tue Mar  2 20:18:46 2021
+ OS/Arch:           linux/arm
+ Context:           default
+ Experimental:      true
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          20.10.5
+  API version:      1.41 (minimum version 1.12)
+  Go version:       go1.13.15
+  Git commit:       363e9a8
+  Built:            Tue Mar  2 20:16:18 2021
+  OS/Arch:          linux/arm
+  Experimental:     false
+ containerd:
+  Version:          1.4.4
+  GitCommit:        05f951a3781f4f2c1911b05e61c160e9c30eaa8e
+ runc:
+  Version:          1.0.0-rc93
+  GitCommit:        12644e614e25b05da6fd08a38ffa0cfe1903fdec
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+```
+
+```bash
+docker info
+Client:
+ Context:    default
+ Debug Mode: false
+ Plugins:
+  app: Docker App (Docker Inc., v0.9.1-beta3)
+  buildx: Build with BuildKit (Docker Inc., v0.5.1-docker)
+
+Server:
+ Containers: 0
+  Running: 0
+  Paused: 0
+  Stopped: 0
+ Images: 0
+ Server Version: 20.10.5
+ Storage Driver: overlay2
+  Backing Filesystem: extfs
+  Supports d_type: true
+  Native Overlay Diff: true
+ Logging Driver: json-file
+ Cgroup Driver: cgroupfs
+ Cgroup Version: 1
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog
+ Swarm: inactive
+ Runtimes: io.containerd.runc.v2 io.containerd.runtime.v1.linux runc
+ Default Runtime: runc
+ Init Binary: docker-init
+ containerd version: 05f951a3781f4f2c1911b05e61c160e9c30eaa8e
+ runc version: 12644e614e25b05da6fd08a38ffa0cfe1903fdec
+ init version: de40ad0
+ Security Options:
+  seccomp
+   Profile: default
+ Kernel Version: 5.10.17-v7+
+ Operating System: Raspbian GNU/Linux 10 (buster)
+ OSType: linux
+ Architecture: armv7l
+ CPUs: 4
+ Total Memory: 924.2MiB
+ Name: rpi01
+ ID: DQUK:L7MR:VKNB:O46Y:E77W:KLVU:WK3O:SWJS:JJZQ:WSQQ:DJLY:E7EV
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Registry: https://index.docker.io/v1/
+ Labels:
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Live Restore Enabled: false
+```
+
+Run a test container
+
+```bash
+docker run --rm hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+4ee5c797bcd7: Pull complete
+Digest: sha256:308866a43596e83578c7dfa15e27a73011bdd402185a84c5cd7f32a88b501a24
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (arm32v7)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
+## Docker Upgrade
+
+Upgrade using package manager
+
+```bash
+sudo apt-get upgrade
+```
