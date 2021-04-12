@@ -18,6 +18,8 @@ The following document describes the installation and configuration of Docker on
 [Installing Image using Linux](https://www.raspberrypi.org/documentation/installation/installing-images/linux.md)
 [Installing Image using Mac](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md)
 [Setting up a wireless LAN via the CLI](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md)
+[Micro-SD Cards Benchmark](http://www.pidramble.com/wiki/benchmarks/microsd-cards)
+[RPi3 Card Reader Overclocking](https://www.jeffgeerling.com/blog/2016/how-overclock-microsd-card-reader-on-raspberry-pi-3)
 
 ## OS Installation
 
@@ -146,6 +148,12 @@ tmpfs           5.0M  4.0K  5.0M   1% /run/lock
 tmpfs           463M     0  463M   0% /sys/fs/cgroup
 /dev/mmcblk0p1  253M   49M  204M  20% /boot
 tmpfs            93M     0   93M   0% /run/user/1000
+
+# Poor man's benchmark for slow SD card
+sudo dd if=/dev/zero of=/home/pi/test bs=8k count=50k conv=fsync; sudo rm -f /home/pi/test
+51200+0 records in
+51200+0 records out
+419430400 bytes (419 MB, 400 MiB) copied, 43.8039 s, 9.6 MB/s
 ```
 
 ### OS Configuration
