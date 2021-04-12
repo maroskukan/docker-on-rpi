@@ -15,6 +15,8 @@
   - [Docker-compose](#docker-compose)
   - [Installation](#installation-1)
   - [Verification](#verification)
+  - [Containers](#containers)
+    - [Pi-hole](#pi-hole)
 
 ## Introduction
 
@@ -412,3 +414,37 @@ sudo pip3 -v install docker-compose
 docker-compose -v
 docker-compose version 1.29.0, build unknown
 ```
+
+## Containers
+
+### Pi-hole
+
+```bash
+# Download the compose file
+wget -O docker-compose.yml \
+    https://raw.githubusercontent.com/maroskukan/docker-on-rpi/main/Dockerfiles/pi-hole/docker-compose.yml
+
+# Build and run
+docker-compose up --detach
+Creating network "pi-hole_default" with the default driver
+Pulling pihole (pihole/pihole:latest)...
+latest: Pulling from pihole/pihole
+9159b6bb9431: Pull complete
+010046f0b40e: Extracting [==================================================>]  1.901kB/1.901kB
+956067455ce8: Download complete
+b26a0a9087a9: Download complete
+bc2a1c51f34f: Download complete
+
+# Verify
+docker-compose ps
+ Name    Command       State                                                   Ports
+---------------------------------------------------------------------------------------------------------------------------------
+pihole   /s6-init   Up (healthy)   0.0.0.0:443->443/tcp, 0.0.0.0:53->53/tcp, 0.0.0.0:53->53/udp, 0.0.0.0:67->67/udp,
+                                   0.0.0.0:80->80/tcp
+
+# Retrieve Admin password
+docker logs pihole | grep random
+Assigning random password: aso4aA
++ pihole -a -p aso4aA aso4aA
+```
+
