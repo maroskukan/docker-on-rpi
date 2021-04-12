@@ -13,8 +13,8 @@
     - [Upgrade](#upgrade)
     - [Uninstall](#uninstall)
   - [Docker-compose](#docker-compose)
-  - [Installation](#installation-1)
-  - [Verification](#verification)
+    - [Installation](#installation-1)
+    - [Verification](#verification)
   - [Containers](#containers)
     - [Pi-hole](#pi-hole)
 
@@ -392,7 +392,7 @@ sudo rm -rf /var/lib/docker
 
 ## Docker-compose
 
-## Installation
+### Installation
 
 Install docker-compose using package manager.
 
@@ -408,7 +408,7 @@ sudo apt-get install -y \
 sudo pip3 -v install docker-compose
 ```
 
-## Verification
+### Verification
 
 ```bash
 docker-compose -v
