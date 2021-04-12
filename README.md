@@ -25,12 +25,12 @@ The following document describes the installation and configuration of Docker on
 
 ## Documentation
 
-[Installing Image using Linux](https://www.raspberrypi.org/documentation/installation/installing-images/linux.md)
-[Installing Image using Mac](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md)
-[Setting up a wireless LAN via the CLI](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md)
-[Micro-SD Cards Benchmark](http://www.pidramble.com/wiki/benchmarks/microsd-cards)
-[RPi3 Card Reader Overclocking](https://www.jeffgeerling.com/blog/2016/how-overclock-microsd-card-reader-on-raspberry-pi-3)
-[Dockerhub ARM Images](https://registry.hub.docker.com/search?q=&type=image&architecture=arm%2Carm64)
+- [Installing Image using Linux](https://www.raspberrypi.org/documentation/installation/installing-images/linux.md)
+- [Installing Image using Mac](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md)
+- [Setting up a wireless LAN via the CLI](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md)
+- [Micro-SD Cards Benchmark](http://www.pidramble.com/wiki/benchmarks/microsd-cards)
+- [RPi3 Card Reader Overclocking](https://www.jeffgeerling.com/blog/2016/how-overclock-microsd-card-reader-on-raspberry-pi-3)
+- [Dockerhub ARM Images](https://registry.hub.docker.com/search?q=&type=image&architecture=arm%2Carm64)
 
 ## Raspberry Pi OS
 
