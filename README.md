@@ -3,12 +3,18 @@
 - [Running Docker on Raspberry Pi](#running-docker-on-raspberry-pi)
   - [Introduction](#introduction)
   - [Documentation](#documentation)
-  - [OS Installation](#os-installation)
+  - [Raspberry Pi OS](#raspberry-pi-os)
     - [Prepare SD Card](#prepare-sd-card)
-    - [Boot the Image](#boot-the-image)
-    - [OS Configuration](#os-configuration)
-  - [Docker Installation](#docker-installation)
-  - [Docker Upgrade](#docker-upgrade)
+    - [Boot](#boot)
+    - [Configuration](#configuration)
+  - [Docker](#docker)
+    - [Installation](#installation)
+    - [Systemctl Verify](#systemctl-verify)
+    - [Upgrade](#upgrade)
+    - [Uninstall](#uninstall)
+  - [Docker-compose](#docker-compose)
+  - [Installation](#installation-1)
+  - [Verification](#verification)
 
 ## Introduction
 
@@ -24,7 +30,7 @@ The following document describes the installation and configuration of Docker on
 [RPi3 Card Reader Overclocking](https://www.jeffgeerling.com/blog/2016/how-overclock-microsd-card-reader-on-raspberry-pi-3)
 [Dockerhub ARM Images](https://registry.hub.docker.com/search?q=&type=image&architecture=arm%2Carm64)
 
-## OS Installation
+## Raspberry Pi OS
 
 ### Prepare SD Card
 
@@ -108,7 +114,7 @@ sudo rm -rf /Volumes/Rpi
 sudo diskutil eject /dev/rdisk2
 ```
 
-### Boot the Image
+### Boot
 
 Insert the SD Card into the RPI and power on. After initial boot sequence, the RPI should be up and running. Default username is `pi` and default password is `raspberry`.
 
@@ -159,7 +165,7 @@ sudo dd if=/dev/zero of=/home/pi/test bs=8k count=50k conv=fsync; sudo rm -f /ho
 419430400 bytes (419 MB, 400 MiB) copied, 43.8039 s, 9.6 MB/s
 ```
 
-### OS Configuration
+### Configuration
 
 Retrieve the latest list of packages and update the system.
 
@@ -203,7 +209,9 @@ ssh pi@rpi01.home
 Linux rpi01 5.10.17-v7+ #1403 SMP Mon Feb 22 11:29:51 GMT 2021 armv7l
 ```
 
-## Docker Installation
+## Docker
+
+### Installation
 
 Downlaod the installation script.
 
@@ -344,10 +352,63 @@ For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 ```
 
-## Docker Upgrade
+### Systemctl Verify
+
+Verify that `docker.service` is set to start after reboot.
+
+```bash
+sudo systemctl status docker
+● docker.service - Docker Application Container Engine
+   Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
+   Active: active (running) since Mon 2021-04-12 12:16:10 CEST; 17min ago
+     Docs: https://docs.docker.com
+ Main PID: 1689 (dockerd)
+    Tasks: 14
+   CGroup: /system.slice/docker.service
+           └─1689 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+```
+### Upgrade
 
 Upgrade using package manager
 
 ```bash
 sudo apt-get upgrade
+```
+
+### Uninstall
+
+Uninstall docker using package manager.
+
+```bash
+# Uninstall binaries
+sudo apt-get purge docker-ce
+
+# Clean images, containers, volumes and other data
+sudo rm -rf /var/lib/docker
+```
+
+
+## Docker-compose
+
+## Installation
+
+Install docker-compose using package manager.
+
+```bash
+# Install depdendencies
+sudo apt-get install -y \
+             libffi-dev \
+             libssl-dev \
+             python3 \
+             python3-pip
+
+# Install Docker compose
+sudo pip3 -v install docker-compose
+```
+
+## Verification
+
+```bash
+docker-compose -v
+docker-compose version 1.29.0, build unknown
 ```
