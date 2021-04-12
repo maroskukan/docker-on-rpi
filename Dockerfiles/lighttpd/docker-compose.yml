@@ -1,0 +1,8 @@
+lighttpd:
+    image: maroskukan/lighttpd
+    volumes:
+      - <home-directory>:/var/www/localhost/htdocs
+      - <config-directory>:/etc/lighttpd
+    ports:
+      - "<http-port>:80"
+    tty: true
