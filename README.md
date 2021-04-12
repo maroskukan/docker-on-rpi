@@ -6,6 +6,7 @@
   - [OS Installation](#os-installation)
     - [Prepare SD Card](#prepare-sd-card)
     - [Boot the Image](#boot-the-image)
+    - [OS Configuration](#os-configuration)
 
 ## Introduction
 
@@ -106,8 +107,10 @@ sudo diskutil eject /dev/rdisk2
 
 Insert the SD Card into the RPI and power on. After initial boot sequence, the RPI should be up and running. Default username is `pi` and default password is `raspberry`.
 
+*By default when RPI connects to Wireless network, it will receive a dynamic IP address from DHCP service running on local router. In order to make the address assignment more deterministic, you can configure a static DHCP address binding on your home router and use name instead of IP address.*
+
 ```bash
-ssh pi@10.0.2.118
+ssh pi@rpi01.home
 
 # Verify model
 cat /proc/device-tree/model
@@ -143,5 +146,49 @@ tmpfs           5.0M  4.0K  5.0M   1% /run/lock
 tmpfs           463M     0  463M   0% /sys/fs/cgroup
 /dev/mmcblk0p1  253M   49M  204M  20% /boot
 tmpfs            93M     0   93M   0% /run/user/1000
+```
+
+### OS Configuration
+
+Retrieve the latest list of packages and update the system.
+
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+Change default password for `pi` user.
+
+```bash
+# Change default password
+passwd <your-new-password>
+```
+
+Update system name.
+
+```bash
+sudo hostnamectl set-hostname rpi01
+```
+
+Apply the changes.
+
+```bash
+sudo reboot
+```
+
+After reboot update the timezone.
+
+```bash
+sudo timedatectl set-timezone Europe/Bratislava
+```
+
+Copy your public key from local machine to RPI.
+
+```bash
+# Copy RSA Public Key
+ssh-copy-id -i ~/.ssh/id_rsa.pub pi@rpi01.home
+
+# Verify Access
+ssh pi@rpi01.home
+Linux rpi01 5.10.17-v7+ #1403 SMP Mon Feb 22 11:29:51 GMT 2021 armv7l
 ```
 
