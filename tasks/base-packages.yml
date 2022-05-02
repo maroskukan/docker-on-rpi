@@ -1,0 +1,6 @@
+---
+- name: Ensure base apt packages are present.
+  apt:
+    name: "{{ base_packages }}"
+    state: present
+  become: true

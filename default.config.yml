@@ -1,0 +1,20 @@
+---
+tld: home
+timezone: Europe/Bratislava
+
+
+downloads: /tmp
+
+configure_system: true
+
+install_base: true
+base_packages:
+  - git
+  - jq
+
+install_docker: true
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose
