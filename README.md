@@ -185,7 +185,7 @@ passwd <your-new-password>
 Update system name.
 
 ```bash
-sudo hostnamectl set-hostname rpi01
+sudo hostnamectl set-hostname rpi01.home
 ```
 
 Apply the changes.
@@ -204,7 +204,7 @@ Copy your public key from local machine to RPI.
 
 ```bash
 # Copy RSA Public Key
-ssh-copy-id -i ~/.ssh/id_rsa.pub pi@rpi01.home
+ssh-copy-id -i ~/.ssh/home/id_rsa.pub pi@rpi01.home
 
 # Verify Access
 ssh pi@rpi01.home
