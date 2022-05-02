@@ -14,6 +14,6 @@
     backup: true
   become: true
 
-- name: Ensure the timezon is set.
+- name: Ensure the timezone is set.
   community.general.timezone:
     name: "{{ timezone }}"

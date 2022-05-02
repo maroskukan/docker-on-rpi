@@ -215,7 +215,7 @@ Linux rpi01 5.10.17-v7+ #1403 SMP Mon Feb 22 11:29:51 GMT 2021 armv7l
 
 ### Installation
 
-Downlaod the installation script.
+Download the installation script.
 
 ```bash
 curl -fsSL https://get.docker.com -o get-docker.sh
