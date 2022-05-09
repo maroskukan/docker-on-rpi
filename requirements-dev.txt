@@ -1,0 +1,2 @@
+# install the regular requirements, plus ones needed for development
+-r support/req/req-lint.txt
