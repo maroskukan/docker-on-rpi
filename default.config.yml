@@ -17,6 +17,7 @@ base_packages:
 
 install_extra: true
 install_docker: true
+validate_docker: true
 docker_packages:
   - docker-ce
   - docker-ce-cli
