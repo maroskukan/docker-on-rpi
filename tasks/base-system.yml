@@ -15,5 +15,5 @@
   become: true
 
 - name: Ensure the timezone is set.
-  community.general.timezone:
+  community.general.system.timezone:
     name: "{{ timezone }}"

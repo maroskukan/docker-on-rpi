@@ -1,53 +1,36 @@
 ---
 - name: Ensure apt key for docker is present.
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://download.docker.com/linux/{{ ansible_os_family | lower }}/gpg
     state: present
   become: true
   when: install_docker
 
 - name: Ensure repository for docker is present.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: deb https://download.docker.com/linux/{{ ansible_os_family | lower }} {{ ansible_lsb.codename }} stable
     state: present
   become: true
   when: install_docker
 
 - name: Ensure docker and docker tools are present.
-  apt:
+  ansible.builtin.apt:
     name: "{{ docker_packages }}"
     state: present
   become: true
   when: install_docker
 
 - name: Ensure the current user is part of docker group.
-  user:
-    name: "{{ansible_user|default(lookup('env', 'USER')) }}"
+  ansible.builtin.user:
+    name: "{{ ansible_user|default(lookup('env', 'USER')) }}"
     groups: docker
     append: true
   become: true
 
 - name: Ensure the docker service is enabled and started.
-  service:
+  ansible.builtin.service:
     name: docker
     enabled: true
     state: started
   become: true
   when: install_docker
-
-# - name: Ensure a container can be started.
-#   docker_container:
-#     name: validatedocker
-#     state: present
-#     image: hello-world
-#     command: sleep infinity
-
-# - name: Ensure a container can be stopped.
-#   docker_container:
-#     name: validatedocker
-#     state: stopped
-
-# - name: Ensure a container can be removed.
-#   docker_container:
-#     name: validatedocker
-#     state: absent

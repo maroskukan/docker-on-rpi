@@ -29,3 +29,7 @@
     - import_tasks: tasks/extra-packages.yml
       tags: ['extra-packages']
       when: install_extra
+
+    - import_tasks: tasks/docker-validation.yml
+      tags: ['docker-validation']
+      when: validate_docker
