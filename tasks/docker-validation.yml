@@ -1,0 +1,17 @@
+---
+- name: Ensure a container can be started.
+  community.docker.docker_container:
+    name: validatedocker
+    state: present
+    image: hello-world
+    command: sleep infinity
+
+- name: Ensure a container can be stopped.
+  community.docker.docker_container:
+    name: validatedocker
+    state: stopped
+
+- name: Ensure a container can be removed.
+  community.docker.docker_container:
+    name: validatedocker
+    state: absent

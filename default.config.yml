@@ -1,0 +1,25 @@
+---
+tld: home
+timezone: Europe/Bratislava
+
+
+downloads: /tmp
+
+configure_system: true
+
+install_base: true
+base_packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - git
+  - jq
+
+install_extra: true
+install_docker: true
+validate_docker: true
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose

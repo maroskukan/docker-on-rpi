@@ -3,10 +3,14 @@
 - [Running Docker on Raspberry Pi](#running-docker-on-raspberry-pi)
   - [Introduction](#introduction)
   - [Documentation](#documentation)
-  - [Raspberry Pi OS](#raspberry-pi-os)
+  - [Automated Installation](#automated-installation)
     - [Prepare SD Card](#prepare-sd-card)
-    - [Boot](#boot)
+    - [First Boot](#first-boot)
     - [Configuration](#configuration)
+  - [Manual Installation](#manual-installation)
+    - [Prepare SD Card](#prepare-sd-card-1)
+    - [First Boot](#first-boot-1)
+    - [Configuration](#configuration-1)
   - [Docker](#docker)
     - [Installation](#installation)
     - [Systemctl Verify](#systemctl-verify)
@@ -20,7 +24,7 @@
 
 ## Introduction
 
-The following document describes the installation and configuration of Docker on RPI running Raspberry Pi OS Lite.
+The following document describes the different ways how to install and configure of Docker on RPI running Raspberry Pi OS Lite.
 
 
 ## Documentation
@@ -32,8 +36,54 @@ The following document describes the installation and configuration of Docker on
 - [RPi3 Card Reader Overclocking](https://www.jeffgeerling.com/blog/2016/how-overclock-microsd-card-reader-on-raspberry-pi-3)
 - [Dockerhub ARM Images](https://registry.hub.docker.com/search?q=&type=image&architecture=arm%2Carm64)
 
-## Raspberry Pi OS
+## Automated Installation
 
+### Prepare SD Card
+
+The automated option includes installation of [Raspberry PI Imager tool](https://www.raspberrypi.com/software/). With this tool you are able to define the following configuration settings before flashing the SD Card.
+
+For the demo build I have selected the following general values in the wizard:
+
+| Key                                  | Value                         |
+| ------------------------------------ | ----------------------------- |
+| Operating System                     | Raspberry Pi OS Lite (64-bit) |
+| Hostname                             | rpi01                         |
+| Enable SSH                           | True                          |
+| Allow public-key authentication only | True                          |
+| Set authorized_keys for 'ansible'    | <your-public-key>             |
+| Username                             | ansible                       |
+| Password                             | <your-password>               |
+| Configure wireless LAN               | True                          |
+| SSID                                 | <your-ssid>                   |
+| Set locale settings                  | True                          |
+| Time zone                            | Europe/Bratislava             |
+| Keyboard layout                      | us                            |
+
+### First Boot
+
+Once the flashing process is finished insert SD card and power on. The PI should be available on your local network for further configuration via Ansible.
+
+### Configuration
+
+In order to leverage Ansible for configuration management you need to ensure that the following prerequsities are met:
+- Python runtime - [virtual environment recommended](https://github.com/pyenv/pyenv), tested with version 3.10.2
+- Python modules - described in `requirements-dev.txt` this will also install `ansible-core`
+- Ansible Galaxy collections - described in `requirements.yml`
+
+After these prerequisities are met, optionally inspect the `default.config.yml` to under stand which configuration values will be applied and which packages will be installed.
+
+Once you are happy with the definitions execute the playbook.
+
+```bash
+ansible-playbook main.yml
+```
+
+Once completed the desired packages including docker will be installed and lifecycle for sample `hello-world` container will be validated.
+
+
+## Manual Installation
+
+The manual option includes SD card layout preparation, custom wireless configuration, user credetials change after first boot and Docker installation and image lifecycle validation.
 ### Prepare SD Card
 
 Start by downloading latest available Raspberry Pi OS Lite archive available from [raspberrypi.org](https://www.raspberrypi.org/software/operating-systems/).
@@ -101,7 +151,7 @@ network={
 EOF
 ```
 
-Enable ssh by creating an empty `ssh` file. 
+Enable ssh by creating an empty `ssh` file.
 
 ```bash
 touch ssh
@@ -116,7 +166,7 @@ sudo rm -rf /Volumes/Rpi
 sudo diskutil eject /dev/rdisk2
 ```
 
-### Boot
+### First Boot
 
 Insert the SD Card into the RPI and power on. After initial boot sequence, the RPI should be up and running. Default username is `pi` and default password is `raspberry`.
 
@@ -185,7 +235,7 @@ passwd <your-new-password>
 Update system name.
 
 ```bash
-sudo hostnamectl set-hostname rpi01
+sudo hostnamectl set-hostname rpi01.home
 ```
 
 Apply the changes.
@@ -204,7 +254,7 @@ Copy your public key from local machine to RPI.
 
 ```bash
 # Copy RSA Public Key
-ssh-copy-id -i ~/.ssh/id_rsa.pub pi@rpi01.home
+ssh-copy-id -i ~/.ssh/home/id_rsa.pub pi@rpi01.home
 
 # Verify Access
 ssh pi@rpi01.home
@@ -213,15 +263,16 @@ Linux rpi01 5.10.17-v7+ #1403 SMP Mon Feb 22 11:29:51 GMT 2021 armv7l
 
 ## Docker
 
+This procedure only needs to take place in case you selected manual installation described above. Automated one will also install and verify docker installation.
 ### Installation
 
-Downlaod the installation script.
+Download the installation script.
 
 ```bash
 curl -fsSL https://get.docker.com -o get-docker.sh
 ```
 
-Execute teh script.
+Execute the script.
 
 ```bash
 sudo sh get-docker.sh
@@ -447,4 +498,3 @@ docker logs pihole | grep random
 Assigning random password: aso4aA
 + pihole -a -p aso4aA aso4aA
 ```
-
