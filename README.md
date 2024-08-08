@@ -21,6 +21,10 @@
     - [Verification](#verification)
   - [Containers](#containers)
     - [Pi-hole](#pi-hole)
+  - [Tips](#tips)
+    - [Customize using systemd-nspawn](#customize-using-systemd-nspawn)
+      - [Customize the SD card](#customize-the-sd-card)
+      - [Access target environment](#access-target-environment)
 
 ## Introduction
 
@@ -35,6 +39,8 @@ The following document describes the different ways how to install and configure
 - [Micro-SD Cards Benchmark](http://www.pidramble.com/wiki/benchmarks/microsd-cards)
 - [RPi3 Card Reader Overclocking](https://www.jeffgeerling.com/blog/2016/how-overclock-microsd-card-reader-on-raspberry-pi-3)
 - [Dockerhub ARM Images](https://registry.hub.docker.com/search?q=&type=image&architecture=arm%2Carm64)
+- [Systemd-nspawn](https://blog.oddbit.com/post/2016-02-07-systemd-nspawn-for-fun-and-wel/)
+- [Custom image](https://forums.raspberrypi.com/viewtopic.php?f=63&t=231762&p=1462118#p1462118)
 
 ## Automated Installation
 
@@ -84,6 +90,7 @@ Once completed the desired packages including docker will be installed and lifec
 ## Manual Installation
 
 The manual option includes SD card layout preparation, custom wireless configuration, user credetials change after first boot and Docker installation and image lifecycle validation.
+
 ### Prepare SD Card
 
 Start by downloading latest available Raspberry Pi OS Lite archive available from [raspberrypi.org](https://www.raspberrypi.org/software/operating-systems/).
@@ -264,6 +271,7 @@ Linux rpi01 5.10.17-v7+ #1403 SMP Mon Feb 22 11:29:51 GMT 2021 armv7l
 ## Docker
 
 This procedure only needs to take place in case you selected manual installation described above. Automated one will also install and verify docker installation.
+
 ### Installation
 
 Download the installation script.
@@ -498,3 +506,165 @@ docker logs pihole | grep random
 Assigning random password: aso4aA
 + pihole -a -p aso4aA aso4aA
 ```
+
+
+## Tips
+
+### Customize using systemd-nspawn
+
+#### Customize the SD card
+
+Start by downloading latest available Raspberry Pi OS Lite archive available from [raspberrypi.org](https://www.raspberrypi.org/software/operating-systems/).
+
+Example from Ubuntu below.
+
+```bash
+# Download archive
+wget https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2024-03-15/2024-03-15-raspios-bookworm-arm64-lite.img.xz
+
+# Download checksum
+wget https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2024-03-15/2024-03-15-raspios-bookworm-arm64-lite.img.xz.sha256
+
+# Verify checksum
+sha256sum -c 2024-03-15-raspios-bookworm-arm64-lite.img.xz.sha256
+2024-03-15-raspios-bookworm-arm64-lite.img.xz: OK
+```
+
+Identify the block device (SD Card) and write the image.
+
+```bash
+# Search for disk device with size smaller than 64G
+lsblk -d -o NAME,TYPE,SIZE | awk '$2 == "disk" && $3 ~ /[0-9.]+G/ && $3+0 < 64 {print $1}'
+
+mmcblk0
+
+# Unmount the disk and or existing partitions
+umount /dev/mmcblk0p1
+
+# Extract image from archive
+unxz 2024-03-15-raspios-bookworm-arm64-lite.img.xz
+
+# Write image to SD Card
+sudo dd if=2024-03-15-raspios-bookworm-arm64-lite.img of=/dev/mmcblk0 bs=4M status=progress; sync
+2336227328 bytes (2,3 GB, 2,2 GiB) copied, 5 s, 466 MB/s
+660+0 records in
+660+0 records out
+2768240640 bytes (2,8 GB, 2,6 GiB) copied, 72,7164 s, 38,1 MB/s
+
+# Verify newly created partitions
+lsblk /dev/mmcblk0
+
+NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+mmcblk0     179:0    0 58,2G  0 disk 
+├─mmcblk0p1 179:1    0  512M  0 part 
+└─mmcblk0p2 179:2    0  2,1G  0 part 
+
+sudo fdisk -l /dev/mmcblk0                                                                       
+Disk /dev/mmcblk0: 58,24 GiB, 62534975488 bytes, 122138624 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0xfb33757d
+
+Device         Boot   Start     End Sectors  Size Id Type
+/dev/mmcblk0p1         8192 1056767 1048576  512M  c W95 FAT32 (LBA)
+/dev/mmcblk0p2      1056768 5406719 4349952  2,1G 83 Linux
+```
+
+As you can see in the above output, the image only uses 2.1G out of 58.2G for the root partition. In order to fully utilize the available space on the SD card we need to resize this paritition and extend the filesystem.
+
+```bash
+# Resize the second partition
+sudo parted /dev/mmcblk0 resizepart 2 100%
+
+# Verify the second partition
+lsblk /dev/mmcblk0
+
+NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+mmcblk0     179:0    0 58,2G  0 disk 
+├─mmcblk0p1 179:1    0  512M  0 part 
+└─mmcblk0p2 179:2    0 57,7G  0 part 
+
+# Extend the filesystem on the second partition
+sudo resize2fs /dev/mmcblk0p2
+resize2fs 1.47.0 (5-Feb-2023)
+Resizing the filesystem on /dev/mmcblk0p2 to 15135232 (4k) blocks.
+The filesystem on /dev/mmcblk0p2 is now 15135232 (4k) blocks long.
+
+# Verify the filesystem on the second partition
+sudo fdisk -l /dev/mmcblk0
+Disk /dev/mmcblk0: 58,24 GiB, 62534975488 bytes, 122138624 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0xfb33757d
+
+Device         Boot   Start       End   Sectors  Size Id Type
+/dev/mmcblk0p1         8192   1056767   1048576  512M  c W95 FAT32 (LBA)
+/dev/mmcblk0p2      1056768 122138623 121081856 57,7G 83 Linux
+```
+
+Once happy with the layout, remove the source artifacts.
+
+```bash
+# Remove image and checksum files 
+rm 2024-03-15-raspios-bookworm-arm64-lite.img
+rm 2024-03-15-raspios-bookworm-arm64-lite.img.xy.sha256
+```
+
+#### Access target environment
+
+```bash
+sudo apt-get install -y qemu-user-static
+```
+
+```bash
+# Mount root directory
+sudo mkdir /mnt/rootfs
+sudo mount /dev/mmcblk0p2 /mnt/rootfs
+
+# Mount boot directory
+sudo mount /dev/mmcblk0p1 /mnt/rootfs/boot
+```
+
+```bash
+# Run a shell inside the rpi root filesystem using a container
+sudo systemd-nspawn --hostname raspberrypi --directory=/mnt/rootfs
+
+Spawning container rpiroot on /mnt/rootfs.
+Press ^] three times within 1s to kill container.
+```
+
+Now that we are in the container lets start by some simple verification.
+
+```bash
+# Print the current architecture
+dpkg --print-architecture
+arm64
+```
+
+
+```bash
+# Set password for root user
+passwd
+
+# Set password for pi user
+passwd pi 
+
+# Enable ssh
+touch /boot/ssh
+
+# Update pakacage list and upgrade all packages
+apt update && sudo apt upgrade -y
+
+#### Cleanup
+```bash
+^^^
+umount /mnt/rootfs/boot
+umount /mnt/rootfs
+```
+
+
+1. powerup
